@@ -1,3 +1,5 @@
 env
 .vscode
 backend/.env
+backend/__pycache__
+backend/jobs/migrations
