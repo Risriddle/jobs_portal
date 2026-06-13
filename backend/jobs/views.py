@@ -10,7 +10,8 @@ from rest_framework.filters import SearchFilter
 
 from rest_framework.decorators import action
 from rest_framework.response import Response
-
+from django.db.models import Count
+from rest_framework.views import APIView
 
 class JobViewSet(viewsets.ModelViewSet):
     queryset = Job.objects.all().order_by("-created_at")
@@ -60,3 +61,32 @@ class JobStatusViewSet(viewsets.ReadOnlyModelViewSet):
 class JobCategoryViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = JobCategory.objects.all()
     serializer_class = JobCategorySerializer
+
+
+class AnalyticsView(APIView):
+
+    def get(self, request):
+
+        status_data = (
+            JobStatus.objects
+            .annotate(total=Count("jobs"))
+            .values("name", "total")
+        )
+
+        city_data = (
+            Job.objects
+            .values("city")
+            .annotate(total=Count("id"))
+        )
+
+        state_data = (
+            Job.objects
+            .values("state")
+            .annotate(total=Count("id"))
+        )
+
+        return Response({
+            "status_distribution": status_data,
+            "city_distribution": city_data,
+            "state_distribution": state_data,
+        })

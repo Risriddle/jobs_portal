@@ -4,7 +4,8 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     JobViewSet,
     JobStatusViewSet,
-    JobCategoryViewSet
+    JobCategoryViewSet,
+    AnalyticsView
 )
 
 router = DefaultRouter()
@@ -14,6 +15,7 @@ router.register("statuses", JobStatusViewSet)
 router.register("categories", JobCategoryViewSet)
 
 urlpatterns = [
-    path("", include(router.urls))
+    path("", include(router.urls)),
+    path("analytics/", AnalyticsView.as_view()),
     
 ]
