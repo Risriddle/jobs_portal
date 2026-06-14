@@ -10,6 +10,8 @@ const emit = defineEmits([
 const statuses = ref([]);
 const categories = ref([]);
 
+const loading = ref(false);
+
 const title = ref("");
 const description = ref("");
 
@@ -23,7 +25,8 @@ const endDate = ref("");
 const selectedStatuses = ref([]);
 const selectedCategories = ref([]);
 
-const loading = ref(false);
+const image = ref(null);
+const imagePreview = ref(null);
 
 onMounted(async () => {
   try {
@@ -37,31 +40,72 @@ onMounted(async () => {
   }
 });
 
+function handleImage(event) {
+  const file = event.target.files[0];
+
+  if (!file) return;
+
+  image.value = file;
+  imagePreview.value = URL.createObjectURL(file);
+}
+
 async function createJob() {
+  if (!title.value.trim()) {
+    alert("Title is required");
+    return;
+  }
+
+  if (endDate.value < startDate.value) {
+    alert("End date cannot be before start date");
+    return;
+  }
+
   try {
     loading.value = true;
 
-    await api.post("/jobs/", {
-      title: title.value,
-      description: description.value,
+    const formData = new FormData();
 
-      statuses: selectedStatuses.value,
-      categories: selectedCategories.value,
+    formData.append("title", title.value);
+    formData.append("description", description.value);
 
-      address: address.value,
-      city: city.value,
-      state: state.value,
+    formData.append("address", address.value);
+    formData.append("city", city.value);
+    formData.append("state", state.value);
 
-      start_date: startDate.value,
-      end_date: endDate.value
+    formData.append("start_date", startDate.value);
+    formData.append("end_date", endDate.value);
+
+    selectedStatuses.value.forEach((status) => {
+      formData.append("statuses", status);
     });
+
+    selectedCategories.value.forEach((category) => {
+      formData.append("categories", category);
+    });
+
+    if (image.value) {
+      formData.append(
+        "profile_picture",
+        image.value
+      );
+    }
+
+    await api.post(
+      "/jobs/",
+      formData,
+      {
+        headers: {
+          "Content-Type":
+            "multipart/form-data"
+        }
+      }
+    );
 
     emit("created");
     emit("close");
 
   } catch (error) {
     console.error(error);
-
     alert("Failed to create job");
   } finally {
     loading.value = false;
@@ -70,34 +114,77 @@ async function createJob() {
 </script>
 
 <template>
-  <div class="modal-overlay">
+  <div class="overlay">
 
     <div class="modal">
 
-      <h2>Create Job</h2>
+      <div class="header">
+        <h2>Create Job</h2>
+
+        <button
+          class="close-btn"
+          @click="emit('close')"
+        >
+          ✕
+        </button>
+      </div>
 
       <div class="form-group">
-        <label>Job Title</label>
+
+        <label>
+          Job Profile Picture
+        </label>
+
+        <input
+          type="file"
+          accept="image/*"
+          @change="handleImage"
+        />
+
+      </div>
+
+      <div
+        v-if="imagePreview"
+        class="preview"
+      >
+        <img
+          :src="imagePreview"
+          alt="Preview"
+        />
+      </div>
+
+      <div class="form-group">
+
+        <label>
+          Job Title
+        </label>
 
         <input
           v-model="title"
-          type="text"
           placeholder="Enter job title"
         />
+
       </div>
 
       <div class="form-group">
-        <label>Description</label>
+
+        <label>
+          Description
+        </label>
 
         <textarea
           v-model="description"
-          rows="5"
-          placeholder="Enter job description"
+          rows="4"
+          placeholder="Enter description"
         />
+
       </div>
 
       <div class="form-group">
-        <label>Status</label>
+
+        <label>
+          Status
+        </label>
 
         <select
           multiple
@@ -111,10 +198,14 @@ async function createJob() {
             {{ status.name }}
           </option>
         </select>
+
       </div>
 
       <div class="form-group">
-        <label>Category</label>
+
+        <label>
+          Category
+        </label>
 
         <select
           multiple
@@ -128,66 +219,100 @@ async function createJob() {
             {{ category.name }}
           </option>
         </select>
+
       </div>
 
       <div class="form-group">
-        <label>Address</label>
+
+        <label>
+          Address
+        </label>
 
         <input
           v-model="address"
-          type="text"
           placeholder="Address"
         />
+
       </div>
 
-      <div class="form-group">
-        <label>City</label>
+      <div class="location-grid">
 
-        <input
-          v-model="city"
-          type="text"
-          placeholder="City"
-        />
+        <div>
+
+          <label>
+            City
+          </label>
+
+          <input
+            v-model="city"
+            placeholder="City"
+          />
+
+        </div>
+
+        <div>
+
+          <label>
+            State
+          </label>
+
+          <input
+            v-model="state"
+            placeholder="State"
+          />
+
+        </div>
+
       </div>
 
-      <div class="form-group">
-        <label>State</label>
+      <div class="date-grid">
 
-        <input
-          v-model="state"
-          type="text"
-          placeholder="State"
-        />
+        <div>
+
+          <label>
+            Start Date
+          </label>
+
+          <input
+            type="date"
+            v-model="startDate"
+          />
+
+        </div>
+
+        <div>
+
+          <label>
+            End Date
+          </label>
+
+          <input
+            type="date"
+            v-model="endDate"
+          />
+
+        </div>
+
       </div>
 
-      <div class="form-group">
-        <label>Start Date</label>
-
-        <input
-          v-model="startDate"
-          type="date"
-        />
-      </div>
-
-      <div class="form-group">
-        <label>End Date</label>
-
-        <input
-          v-model="endDate"
-          type="date"
-        />
-      </div>
-
-      <div class="button-group">
+      <div class="actions">
 
         <button
+          class="primary"
           @click="createJob"
           :disabled="loading"
         >
-          {{ loading ? "Creating..." : "Create Job" }}
+          {{
+            loading
+              ? "Creating..."
+              : "Create Job"
+          }}
         </button>
 
-        <button @click="emit('close')">
+        <button
+          class="secondary"
+          @click="emit('close')"
+        >
           Cancel
         </button>
 
@@ -199,52 +324,104 @@ async function createJob() {
 </template>
 
 <style scoped>
-.modal-overlay {
+.overlay {
   position: fixed;
   inset: 0;
+
   background: rgba(0, 0, 0, 0.5);
 
   display: flex;
   justify-content: center;
   align-items: center;
+
+  z-index: 999;
 }
 
 .modal {
   background: white;
 
-  width: 600px;
-  max-width: 90%;
+  width: 700px;
+  max-width: 95%;
+
+  max-height: 90vh;
+  overflow-y: auto;
 
   padding: 24px;
 
   border-radius: 12px;
 }
 
-.form-group {
-  margin-bottom: 16px;
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 
+  margin-bottom: 20px;
+}
+
+.close-btn {
+  border: none;
+  background: none;
+
+  cursor: pointer;
+
+  font-size: 18px;
+}
+
+.form-group {
   display: flex;
   flex-direction: column;
+
+  margin-bottom: 16px;
 }
 
 input,
 textarea,
 select {
-  padding: 10px;
   margin-top: 6px;
+  padding: 10px;
 }
 
 select {
-  min-height: 120px;
+  min-height: 100px;
 }
 
-.button-group {
+.preview {
+  margin-bottom: 20px;
+}
+
+.preview img {
+  width: 180px;
+  height: 180px;
+
+  object-fit: cover;
+
+  border-radius: 10px;
+}
+
+.location-grid,
+.date-grid {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 12px;
+
+  margin-bottom: 16px;
+}
+
+.actions {
   display: flex;
   gap: 12px;
+
+  margin-top: 20px;
 }
 
-button {
-  padding: 10px 16px;
-  cursor: pointer;
+.primary {
+  padding: 10px 18px;
+}
+
+.secondary {
+  padding: 10px 18px;
 }
 </style>
