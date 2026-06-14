@@ -98,7 +98,11 @@ const emit = defineEmits([
   margin: 4px;
   padding: 4px 8px;
   border-radius: 8px;
+
   background: #efefef;
+
+  color: #111;
+  border: 1px solid #ccc;
 }
 
 .actions {
