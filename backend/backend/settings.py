@@ -32,10 +32,10 @@ DB_PASSWORD = os.environ.get('DB_PASSWORD')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+ALLOWED_HOSTS = [".vercel.app"]
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
+    "https://jobs-portal-murex.vercel.app",
 ]
 
 

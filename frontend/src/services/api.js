@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://127.0.0.1:8000/api",
+  baseURL: "https://jobs-portal-murex.vercel.app/_/backend/api",
 });
 
 export default api;
