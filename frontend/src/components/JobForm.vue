@@ -128,7 +128,7 @@ async function submitJob() {
 
         <!-- Image upload -->
         <div class="field">
-          <label class="field-label">Cover Image</label>
+          <label class="field-label">Profile Image</label>
           <div class="image-upload-row">
             <div class="image-preview-box">
               <img v-if="imagePreview" :src="imagePreview" class="preview-img" alt="Preview" />
@@ -146,13 +146,14 @@ async function submitJob() {
 
         <!-- Title -->
         <div class="field">
-          <label class="field-label" for="job-title">Job Title <span class="required">*</span></label>
+          <label class="field-label" for="job-title">Job Title </label>
           <input id="job-title" v-model="title" placeholder="e.g. Senior Frontend Developer" />
         </div>
 
         <!-- Description -->
         <div class="field">
           <label class="field-label" for="job-desc">Description</label>
+          
           <textarea id="job-desc" v-model="description" placeholder="Describe the role, responsibilities, and requirements…" rows="4" />
         </div>
 

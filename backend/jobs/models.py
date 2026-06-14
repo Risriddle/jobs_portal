@@ -37,7 +37,7 @@ class Job(models.Model):
         related_name="jobs"
     )
 
-    address = models.CharField(max_length=255)
+    address = models.CharField(max_length=255,blank=True)
     city = models.CharField(max_length=100,db_index=True)
     state = models.CharField(max_length=100,db_index=True)
 
