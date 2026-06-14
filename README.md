@@ -1,4 +1,4 @@
-# Job Portal Dashboard
+# JobBoard
 
 A full-stack Job Management application built using **Vue.js**, **Django REST Framework**, and **PostgreSQL**. The platform allows users to create, manage, filter, edit, duplicate, and analyze job postings through a modern dashboard interface.
 
