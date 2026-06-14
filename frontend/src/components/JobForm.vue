@@ -94,7 +94,7 @@ async function submitJob() {
 
     const headers = { "Content-Type": "multipart/form-data" };
     if (isEditMode.value) {
-      await api.patch(`/jobs/${props.jobToEdit.id}/`, formData, { headers });
+      await api.put(`/jobs/${props.jobToEdit.id}/`, formData, { headers });
     } else {
       await api.post("/jobs/", formData, { headers });
     }
