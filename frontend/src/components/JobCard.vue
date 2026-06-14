@@ -4,23 +4,22 @@ defineProps({
     type: Object,
     required: true
   }
-})
+});
 
 const emit = defineEmits([
-  "edit",
   "delete",
   "duplicate"
-])
+]);
 </script>
 
 <template>
-  <div class="job-card">
+  <div class="card">
 
     <img
       v-if="job.profile_picture"
       :src="job.profile_picture"
-      alt="Job"
-      class="job-image"
+      alt="job"
+      class="image"
     >
 
     <h2>{{ job.title }}</h2>
@@ -29,41 +28,82 @@ const emit = defineEmits([
       {{ job.description }}
     </p>
 
-    <p>
-      <strong>City:</strong>
-      {{ job.city }}
-    </p>
+    <div class="section">
+      <strong>Location:</strong>
+      {{ job.city }}, {{ job.state }}
+    </div>
 
-    <p>
-      <strong>State:</strong>
-      {{ job.state }}
-    </p>
+    <div class="section">
+      <strong>Status:</strong>
 
-    <button @click="emit('edit', job)">
-      Edit
-    </button>
+      <span
+        v-for="status in job.status_details"
+        :key="status.id"
+        class="badge"
+      >
+        {{ status.name }}
+      </span>
+    </div>
 
-    <button @click="emit('delete', job.id)">
-      Delete
-    </button>
+    <div class="section">
+      <strong>Category:</strong>
 
-    <button @click="emit('duplicate', job.id)">
-      Duplicate
-    </button>
+      <span
+        v-for="category in job.category_details"
+        :key="category.id"
+        class="badge"
+      >
+        {{ category.name }}
+      </span>
+    </div>
+
+    <div class="actions">
+
+      <button
+        @click="emit('duplicate', job.id)"
+      >
+        Duplicate
+      </button>
+
+      <button
+        @click="emit('delete', job.id)"
+      >
+        Delete
+      </button>
+
+    </div>
 
   </div>
 </template>
 
 <style scoped>
-.job-card {
+.card {
   border: 1px solid #ddd;
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 16px;
 }
 
-.job-image {
+.image {
   width: 100%;
-  height: 180px;
+  height: 200px;
   object-fit: cover;
+}
+
+.section {
+  margin-top: 12px;
+}
+
+.badge {
+  display: inline-block;
+  margin: 4px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  background: #efefef;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
 }
 </style>
