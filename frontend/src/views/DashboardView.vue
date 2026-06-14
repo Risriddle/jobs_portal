@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
 import api from "../services/api";
-
+import "../css/Dashboard.css"
 import JobCard from "../components/JobCard.vue";
 import JobForm from "../components/JobForm.vue";
 
@@ -22,7 +22,6 @@ function openCreate() {
 }
 
 function openEdit(job) {
-  console.log("EDIT CLICKED:", job);
   editingJob.value = job;
   showModal.value = true;
 }
@@ -75,9 +74,7 @@ const filteredJobs = computed(() => {
 
   if (selectedStatus.value) {
     result = result.filter(job =>
-      job.status_details?.some(
-        s => s.id === Number(selectedStatus.value)
-      )
+      job.status_details?.some(s => s.id === Number(selectedStatus.value))
     );
   }
 
@@ -90,53 +87,85 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="container">
+  <div class="dashboard">
 
-    <div class="header">
-      <h1>Job Dashboard</h1>
+    <!-- Top nav bar -->
+    <header class="topbar">
+      <div class="topbar-brand">
+        <span class="topbar-logo">&#9670;</span>
+        <span class="topbar-title">JobBoard</span>
+      </div>
+      <nav class="topbar-nav">
+        <router-link to="/analytics" class="nav-link">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          Analytics
+        </router-link>
+        <button class="btn-primary" @click="openCreate">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Post Job
+        </button>
+      </nav>
+    </header>
 
-      <button @click="openCreate">
-        Post Job
-      </button>
+    <!-- Page content -->
+    <main class="page-content">
 
-      <router-link to="/analytics">
-        Analytics
-      </router-link>
-    </div>
+      <!-- Page heading -->
+      <div class="page-heading">
+        <div>
+          <h1>Job Dashboard</h1>
+          <p class="page-subtitle" v-if="!loading">
+            {{ filteredJobs.length }} {{ filteredJobs.length === 1 ? 'listing' : 'listings' }} found
+          </p>
+        </div>
 
-    <div class="filters">
-      <input v-model="search" placeholder="Search by title" />
+        <!-- Filters -->
+        <div class="filters">
+          <div class="search-wrap">
+            <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input v-model="search" placeholder="Search listings…" class="search-input" />
+          </div>
 
-      <select v-model="selectedStatus">
-        <option value="">All Statuses</option>
+          <select v-model="selectedStatus" class="status-select">
+            <option value="">All Statuses</option>
+            <option v-for="status in statuses" :key="status.id" :value="status.id">
+              {{ status.name }}
+            </option>
+          </select>
+        </div>
+      </div>
 
-        <option
-          v-for="status in statuses"
-          :key="status.id"
-          :value="status.id"
-        >
-          {{ status.name }}
-        </option>
-      </select>
-    </div>
+      <!-- Loading -->
+      <div v-if="loading" class="loading-wrap">
+        <div class="spinner"></div>
+        <span>Loading listings…</span>
+      </div>
 
-    <div v-if="loading">Loading jobs...</div>
+      <!-- Empty state -->
+      <div v-else-if="filteredJobs.length === 0" class="empty-state">
+        <div class="empty-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+        </div>
+        <h3>No listings found</h3>
+        <p>Try adjusting your filters or post a new job.</p>
+        <button class="btn-primary" @click="openCreate">Post a Job</button>
+      </div>
 
-    <div v-else-if="filteredJobs.length === 0" class="empty-state">
-      No Jobs Found
-    </div>
+      <!-- Grid -->
+      <div v-else class="jobs-grid">
+        <JobCard
+          v-for="job in filteredJobs"
+          :key="job.id"
+          :job="job"
+          @delete="deleteJob"
+          @duplicate="duplicateJob"
+          @edit="openEdit"
+        />
+      </div>
 
-    <div v-else class="grid">
-      <JobCard
-        v-for="job in filteredJobs"
-        :key="job.id"
-        :job="job"
-        @delete="deleteJob"
-        @duplicate="duplicateJob"
-        @edit="openEdit"
-      />
-    </div>
+    </main>
 
+    <!-- Modal -->
     <JobForm
       v-if="showModal"
       :key="editingJob?.id || 'create'"
