@@ -29,17 +29,39 @@ const PALETTE = [
 
 const barOptions = {
   responsive: true,
-  plugins: { legend: { display: false } },
+  plugins: {
+    legend: {
+      display: false
+    }
+  },
   scales: {
-    x: { grid: { display: false }, ticks: { font: { size: 12 } } },
-    y: { grid: { color: "rgba(100,116,139,0.1)" }, ticks: { font: { size: 12 } } }
+    x: {
+      grid: {
+        display: false
+      },
+      ticks: {
+        font: {
+          size: 15
+        }
+      }
+    },
+    y: {
+      beginAtZero: true,
+      ticks: {
+        stepSize: 1, 
+        precision: 0 
+      },
+      grid: {
+        color: "rgba(100,116,139,0.1)"
+      }
+    }
   }
 };
 
 const pieOptions = {
   responsive: true,
   plugins: {
-    legend: { position: "bottom", labels: { padding: 16, font: { size: 12 } } }
+    legend: { position: "bottom", labels: { padding: 16, font: { size: 15 } } }
   }
 };
 
@@ -65,7 +87,10 @@ async function fetchAnalytics() {
         data: data.city_distribution.map(i => i.total),
         backgroundColor: PALETTE[0],
         borderRadius: 6,
-        borderSkipped: false
+        borderSkipped: false,
+        maxBarThickness:30,
+        categoryPercentage:0.7,
+        barPercentage:0.8
       }]
     };
 
@@ -76,7 +101,10 @@ async function fetchAnalytics() {
         data: data.state_distribution.map(i => i.total),
         backgroundColor: PALETTE[1],
         borderRadius: 6,
-        borderSkipped: false
+        borderSkipped: false,
+        maxBarThickness:30,
+        categoryPercentage:0.7,
+        barPercentage:0.8
       }]
     };
 

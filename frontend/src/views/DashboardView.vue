@@ -113,7 +113,7 @@ onMounted(async () => {
       <!-- Page heading -->
       <div class="page-heading">
         <div>
-          <h1>Job Dashboard</h1>
+          <h1>Jobs Dashboard</h1>
           <p class="page-subtitle" v-if="!loading">
             {{ filteredJobs.length }} {{ filteredJobs.length === 1 ? 'listing' : 'listings' }} found
           </p>
@@ -127,7 +127,7 @@ onMounted(async () => {
           </div>
 
           <select v-model="selectedStatus" class="status-select">
-            <option value="">All Statuses</option>
+            <option value="">Status</option>
             <option v-for="status in statuses" :key="status.id" :value="status.id">
               {{ status.name }}
             </option>
