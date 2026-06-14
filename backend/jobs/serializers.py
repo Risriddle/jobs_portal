@@ -16,9 +16,29 @@ class JobCategorySerializer(serializers.ModelSerializer):
 
 class JobSerializer(serializers.ModelSerializer):
 
+    statuses = serializers.PrimaryKeyRelatedField(
+        queryset=JobStatus.objects.all(),
+        many=True,
+        write_only=True
+    )
 
-    statuses = JobStatusSerializer(many=True, read_only=True)
-    categories = JobCategorySerializer(many=True, read_only=True)
+    categories = serializers.PrimaryKeyRelatedField(
+        queryset=JobCategory.objects.all(),
+        many=True,
+        write_only=True
+    )
+
+    status_details = JobStatusSerializer(
+        source="statuses",
+        many=True,
+        read_only=True
+    )
+
+    category_details = JobCategorySerializer(
+        source="categories",
+        many=True,
+        read_only=True
+    )
 
     class Meta:
         model = Job
@@ -31,6 +51,6 @@ class JobSerializer(serializers.ModelSerializer):
         if start_date and end_date and end_date < start_date:
             raise serializers.ValidationError(
                 "End date cannot be before start date."
-            )
+                )
 
         return attrs
