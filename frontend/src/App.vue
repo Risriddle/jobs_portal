@@ -2,6 +2,9 @@
 import JobCard from "./components/JobCard.vue"
 import { ref, onMounted } from "vue";
 import api from "./services/api";
+import JobForm from "./components/JobForm.vue"
+
+const showModal = ref(false);
 
 const jobs = ref([]);
 const loading = ref(true);
@@ -26,10 +29,16 @@ onMounted(() => {
   <div>
 
     <h1>Job Dashboard</h1>
+ 
+<button @click="showModal = true">
+  Post Job
+</button>
 
     <div v-if="loading">
       Loading...
     </div>
+
+
 
     <div
       v-else
@@ -40,6 +49,12 @@ onMounted(() => {
         :key="job.id"
         :job="job"
       />
+    
+<JobForm
+  v-if="showModal"
+  @close="showModal = false"
+  @created="fetchJobs"
+/>
     </div>
 
   </div>
