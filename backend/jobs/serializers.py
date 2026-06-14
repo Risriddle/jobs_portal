@@ -5,16 +5,20 @@ from .models import Job, JobStatus, JobCategory
 class JobStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = JobStatus
-        fields = "__all__"
+        fields = ["id", "name"]
 
 
 class JobCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = JobCategory
-        fields = "__all__"
+        fields = ["id", "name"]
 
 
 class JobSerializer(serializers.ModelSerializer):
+
+
+    statuses = JobStatusSerializer(many=True, read_only=True)
+    categories = JobCategorySerializer(many=True, read_only=True)
 
     class Meta:
         model = Job
